@@ -1,0 +1,49 @@
+.iecard {
+  width: 100%;
+  background-color: #fffbac;
+  border-radius: 10px;
+  .iecard-wrapper {
+    padding: 15px;
+    .iecard-wrapper-top {
+      display: flex;
+      margin-bottom: 10px;
+      .month {
+        font-size: 20px;
+        flex: 4;
+      }
+      .state {
+        flex: 1;
+        height: 20px;
+        text-align: center;
+        padding: 5px;
+        border-radius: 5px;
+      }
+    }
+    .iecard-wrapper-middle {
+      display: flex;
+      margin-bottom: 10px;
+      .expences-name {
+        flex: 4;
+        font-size: 18px;
+      }
+      .expences-amount {
+        flex: 1;
+      }
+    }
+    .iecard-wrapper-bottom {
+      margin-bottom: 20px;
+      .remarks {
+      }
+    }
+    .iecard-wrapper-buttons {
+      display: flex;
+      justify-content: space-between;
+      .update-btn {
+      }
+      .Delete-btn {
+      }
+      .change-state-btn {
+      }
+    }
+  }
+}

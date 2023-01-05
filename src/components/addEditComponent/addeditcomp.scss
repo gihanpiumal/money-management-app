@@ -1,0 +1,22 @@
+.add-edit-comp {
+  .add-edit-comp-wrapper {
+    .add-edit-comp-title {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .add-edit-comp-middle {
+      .add-edit-comp-middle-lable-data {
+        .add-edit-comp-middle-input {
+            margin-top: 10px;
+        }
+        .input-error {
+          color: red;
+        }
+      }
+    }
+    .add-edit-comp-btn{
+        margin-top: 10px;
+        margin-right: 0;
+    }
+  }
+}

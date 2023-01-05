@@ -1,0 +1,21 @@
+.navbar {
+  .navbar-wrapper {
+    width: 100%;
+    display: flex;
+    background-color: #d7e9b9;
+    padding: 10px;
+
+    .nawbar-wrapper-left {
+      flex: 2;
+    }
+    .navbar-wrapper-right {
+      flex: 4;
+
+      .navbar-wrapper-right-link {
+        margin-left: 60px;
+        text-decoration: none;
+        color: #fff;
+      }
+    }
+  }
+}

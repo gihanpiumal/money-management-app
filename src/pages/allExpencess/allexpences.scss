@@ -1,0 +1,90 @@
+.all-expences {
+  .all-expences-filter {
+    // background-color: #ffd495;
+    padding: 10px;
+    display: flex;
+    // align-items: center;
+
+    .all-expences-addIcon {
+      font-size: 45px;
+      cursor: pointer;
+    }
+    .filter-area {
+      .select-box {
+        .all-expences-filterByMonth {
+          margin-left: 50px;
+        }
+        .all-expences-filterByState {
+          margin-left: 50px;
+        }
+      }
+      .filter-button {
+        margin-left: 50px;
+        margin-top: 10px;
+        .clear-filter-btn{
+          margin-left: 50px;
+        }
+      }
+    }
+
+    .expences {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      .pending-expences {
+        margin-left: 50px;
+        background-color: #dc0000;
+        padding: 10px;
+        border-radius: 10px;
+      }
+      .complete-expences {
+        margin-left: 50px;
+        background-color: #ffb100;
+        padding: 10px;
+        border-radius: 10px;
+      }
+      .all-expences {
+        margin-left: 50px;
+        background-color: #0002a1;
+        padding: 10px;
+        border-radius: 10px;
+      }
+    }
+  }
+  .all-expences-grids {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+    padding: 10px;
+    .ie-card {
+    }
+  }
+
+  .add-expences-model {
+    .add-edit-comp {
+      .add-edit-comp-wrapper {
+        .add-edit-comp-title {
+          font-size: 18px;
+          margin-bottom: 10px;
+        }
+        .add-edit-comp-middle {
+          .add-edit-comp-middle-lable-data {
+            .add-edit-comp-middle-select {
+            }
+            .add-edit-comp-middle-input {
+              margin-top: 10px;
+            }
+            .input-error {
+              color: red;
+            }
+          }
+        }
+        .add-edit-comp-btn {
+          margin-top: 10px;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
