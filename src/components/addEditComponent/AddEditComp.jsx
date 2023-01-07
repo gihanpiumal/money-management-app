@@ -95,7 +95,7 @@ const AddEditComp = ({ data, editedData }) => {
   return (
     <div className="add-edit-comp">
       <div className="add-edit-comp-wrapper">
-        <div className="add-edit-comp-title">Add Expences</div>
+        <div className="add-edit-comp-title">Edit Expences</div>
         <div className="add-edit-comp-middle">
           <div className="add-edit-comp-middle-lable-data">
             <Select

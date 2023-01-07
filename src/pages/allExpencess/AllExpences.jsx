@@ -11,6 +11,10 @@ import {
   getMonthExpences,
   addMonthExpence,
 } from "../../services/actions/expencesAction";
+import {
+  getPresentMoney,
+  updatePresentMoney,
+} from "../../services/actions/presentMoneyAction";
 
 import "./allexpences.scss";
 
@@ -37,6 +41,7 @@ const AllExpences = () => {
   const [pendingExpences, setPendingExpences] = useState(0);
   const [completeExpences, setCompleteExpences] = useState(0);
   const [totalExpences, setTotalExpences] = useState(0);
+  const [handOnMoney, setHandOnMoney] = useState(0);
   const [filter, setFilter] = useState({
     month_id: "",
     state: "",
@@ -44,19 +49,24 @@ const AllExpences = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    calculateAllExpences();
-  });
-
   let searchObj = {
     month_id: "",
     state: "",
   };
+  let presentMoneyObj = {
+    remark: "",
+  };
 
   useEffect(() => {
     dispatch(getMonthExpences(searchObj)); // load data to redux store
+    dispatch(getPresentMoney(presentMoneyObj)); // load data to redux store
   }, [dispatch]);
 
+  useEffect(() => {
+    calculateAllExpences();
+  });
+
+  const dataPaymentMoney = useSelector((state) => state.PRESENT_MONEY);
   const dataUser = useSelector((state) => state.EXPENCES);
 
   const filterdata = () => {
@@ -78,6 +88,7 @@ const AllExpences = () => {
   const calculateAllExpences = () => {
     let temptotalPendingExpences = 0;
     let temptotalCompleteExpences = 0;
+    let tempHandOnMoney = 0;
     dataUser.map((val) => {
       if (val.state == "Pending") {
         temptotalPendingExpences = temptotalPendingExpences + val.amount;
@@ -85,6 +96,12 @@ const AllExpences = () => {
         temptotalCompleteExpences = temptotalCompleteExpences + val.amount;
       }
     });
+
+    dataPaymentMoney.map((val) => {
+      tempHandOnMoney = val.present_hand_money;
+    });
+
+    setHandOnMoney(tempHandOnMoney);
     setPendingExpences(temptotalPendingExpences);
     setCompleteExpences(temptotalCompleteExpences);
     setTotalExpences(temptotalPendingExpences + temptotalCompleteExpences);
@@ -291,6 +308,7 @@ const AllExpences = () => {
             Complete Expences : {completeExpences}
           </div>
           <div className="all-expences">All Expences : {totalExpences}</div>
+          <div className="hand-on-money">Hand on Money : {handOnMoney}</div>
         </div>
       </div>
       <div className="all-expences-grids">
@@ -300,8 +318,10 @@ const AllExpences = () => {
               className="ie-card"
               data={val}
               key={key}
+              dataPaymentMoney={dataPaymentMoney}
               callFunction={calculateAllExpences}
-              path ={"expence"}
+              handOnMoney= {handOnMoney}
+              path={"expence"}
             />
           );
         })}
@@ -390,9 +410,7 @@ const AllExpences = () => {
                     validateProperty("name", e);
                   }}
                 />
-                <p className="input-error">
-                  {errors.name ? errors.name : ""}
-                </p>
+                <p className="input-error">{errors.name ? errors.name : ""}</p>
               </div>
               <div className="add-edit-comp-middle-lable-data">
                 <Input

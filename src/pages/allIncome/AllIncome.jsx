@@ -11,38 +11,12 @@ import {
   getMonthIncomes,
   addMonthIncome,
 } from "../../services/actions/incomeAction";
+import {
+  getPresentMoney,
+  updatePresentMoney,
+} from "../../services/actions/presentMoneyAction";
 
 import "./allincome.scss";
-const tempObj = [
-  {
-    month_id: "January",
-    income_name: "allowance 1",
-    amount: 2000,
-    state: "Pending",
-    remark: "remarks 1 Lorem ipsum dolor sit ",
-  },
-  // {
-  //   month_id: "January",
-  //   income_name: "allowance 1",
-  //   amount: 2000,
-  //   state: "Complete",
-  //   remark: "remarks 1 Lorem ipsum dolor sit amet consectetur ",
-  // },
-  // {
-  //   month_id: "January",
-  //   income_name: "allowance 1",
-  //   amount: 2000,
-  //   state: "Complete",
-  //   remark: "remarks 1 Lorem ipsum dolor sit amet consectetur ",
-  // },
-  // {
-  //   month_id: "January",
-  //   income_name: "allowance 1",
-  //   amount: 2000,
-  //   state: "Complete",
-  //   remark: "remarks 1 Lorem ipsum dolor sit amet consectetur ",
-  // },
-];
 
 // schema for validation
 
@@ -67,6 +41,7 @@ const AllIncome = () => {
   const [pendingExpences, setPendingExpences] = useState(0);
   const [completeExpences, setCompleteExpences] = useState(0);
   const [totalExpences, setTotalExpences] = useState(0);
+  const [handOnMoney, setHandOnMoney] = useState(0);
   const [filter, setFilter] = useState({
     month_id: "",
     state: "",
@@ -74,19 +49,23 @@ const AllIncome = () => {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    calculateAllExpences();
-  });
-
   let searchObj = {
     month_id: "",
     state: "",
   };
-
+  let presentMoneyObj = {
+    remark: "",
+  };
   useEffect(() => {
     dispatch(getMonthIncomes(searchObj)); // load data to redux store
+    dispatch(getPresentMoney(presentMoneyObj)); // load data to redux store
   }, [dispatch]);
 
+  useEffect(() => {
+    calculateAllExpences();
+  });
+
+  const dataPaymentMoney = useSelector((state) => state.PRESENT_MONEY);
   const dataUser = useSelector((state) => state.INCOMES);
 
   const filterdata = () => {
@@ -108,6 +87,7 @@ const AllIncome = () => {
   const calculateAllExpences = () => {
     let temptotalPendingExpences = 0;
     let temptotalCompleteExpences = 0;
+    let tempHandOnMoney = 0;
     dataUser.map((val) => {
       if (val.state == "Pending") {
         temptotalPendingExpences = temptotalPendingExpences + val.amount;
@@ -115,6 +95,12 @@ const AllIncome = () => {
         temptotalCompleteExpences = temptotalCompleteExpences + val.amount;
       }
     });
+
+    dataPaymentMoney.map((val) => {
+      tempHandOnMoney = val.present_hand_money;
+    });
+
+    setHandOnMoney(tempHandOnMoney);
     setPendingExpences(temptotalPendingExpences);
     setCompleteExpences(temptotalCompleteExpences);
     setTotalExpences(temptotalPendingExpences + temptotalCompleteExpences);
@@ -315,12 +301,13 @@ const AllIncome = () => {
         </div>
         <div className="expences">
           <div className="pending-expences">
-            Pending Expences : {pendingExpences}
+            Pending Income : {pendingExpences}
           </div>
           <div className="complete-expences">
-            Complete Expences : {completeExpences}
+            Complete Income : {completeExpences}
           </div>
-          <div className="all-expences">All Expences : {totalExpences}</div>
+          <div className="all-expences">All Income : {totalExpences}</div>
+          <div className="hand-on-money">Hand on Money : {handOnMoney}</div>
         </div>
       </div>
       <div className="all-income-grids">
@@ -330,8 +317,10 @@ const AllIncome = () => {
               className="ie-card"
               data={val}
               key={key}
+              dataPaymentMoney={dataPaymentMoney}
               callFunction={calculateAllExpences}
-              path ={"income"}
+              handOnMoney= {handOnMoney}
+              path={"income"}
             />
           );
         })}

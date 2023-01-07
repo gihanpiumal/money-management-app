@@ -2,16 +2,14 @@ import React, { useState, useEffect } from "react";
 import Joi from "joi";
 import { useDispatch, useSelector } from "react-redux";
 
-import AddBoxIcon from "@mui/icons-material/AddBox";
+import "./yearplancard.scss";
+
 import Button from "@mui/material/Button";
-import { Input, Select, Modal, message } from "antd";
+import { Modal, Input, Select, message } from "antd";
 
-import "./yearplan.scss";
-
-import { YearPlanCard } from "../../components";
 import {
-  getYearPlans,
-  addYearPlan,
+  deleteYearPlan,
+  updateYearPlan,
 } from "../../services/actions/yearPlanAction";
 
 const schema = Joi.object({
@@ -21,43 +19,30 @@ const schema = Joi.object({
   remark: Joi.string().empty("").label("Remarks"),
 });
 
-const YearPlan = () => {
-  const [addModal, setAddModal] = useState(false);
+const YearPlanCard = ({ data }) => {
+  const [editModal, setEditModal] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [recordId, setRecordId] = useState(data._id);
   const [form, setForm] = useState({
-    plan_name: "",
-    expect_budget: 0,
-    saving_amount: 0,
-    remark: "",
+    plan_name: data.plan_name,
+    expect_budget: data.expect_budget,
+    saving_amount: data.saving_amount,
+    remark: data.remark,
   });
   const [errors, setErrors] = useState([]);
-  const [filter, setFilter] = useState({
-    plan_name: "",
-  });
-
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getYearPlans(filter)); // load data to redux store
-  }, [dispatch]);
-
-  const dataUser = useSelector((state) => state.YEAR_PLANS);
-
-  const handleCancelAddModal = () => {
-    setAddModal(false);
-    resetForm();
+  const handleEditModal = () => {
+    setEditModal(true);
   };
-  const handleAddModal = () => {
-    setAddModal(true);
+  const handleCancelEditModal = () => {
+    setEditModal(false);
   };
-
-  const resetForm = () => {
-    setForm({
-      ...form,
-      ["plan_name"]: "",
-      ["expect_budget"]: null,
-      ["saving_amount"]: null,
-      ["remark"]: "",
-    });
+  const showdeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+  const handleDeleteModal = () => {
+    setIsDeleteModalOpen(false);
   };
 
   // submit validation
@@ -100,76 +85,123 @@ const YearPlan = () => {
     }
   };
 
-  const filterdata = async () => {
-    dispatch(getYearPlans(filter));
-  };
+  const handleDelete = async () => {
+    let data = dispatch(deleteYearPlan(recordId));
 
-  const submit = async () => {
-    if (validate()) {
-      return;
-    }
-
-    let data = await dispatch(addYearPlan(form));
     if (data) {
-      handleCancelAddModal();
-      await message.success({
-        content: "Year Plan Added Successfully",
+      handleDeleteModal();
+      message.success({
+        content: "Year Plan deleted Successfully",
         style: {
           marginTop: "10vh",
         },
       });
     }
-    handleCancelAddModal();
-    setErrors([]);
+    handleDeleteModal();
   };
 
-  const handleChangeSelect = (name, value) => {
-    setFilter({ ...filter, [name]: value });
+  const editSubmit = async () => {
+    if (validate()) {
+      return;
+    }
+    let data = dispatch(updateYearPlan(recordId, form)); // save new student data
+
+    if (data) {
+      message.success({
+        content: "Year Plan Edited Successfully",
+        style: {
+          marginTop: "10vh",
+        },
+      });
+    }
+
+    setEditModal(false);
   };
+
   return (
-    <div className="year-plan">
-      <div className="year-plan-search-bar">
-        <AddBoxIcon className="all-income-addIcon" onClick={handleAddModal} />
-        <div className="search-area">
-          <div className="search-box">
-            <Input
-              className="search-input"
-              placeholder="Search by plan name"
-              id="plan_name"
-              value={filter.plan_name}
-              onChange={(e) => {
-                handleChangeSelect("plan_name", e.target.value);
-              }}
-            />
+    <div className="year-plans">
+      <div className="year-plans-wrapper">
+        <div className="year-plans-top">
+          <div className="year-plans-name">{data.plan_name}</div>
+          <div className="year-plans-budget">Budget : {data.expect_budget}</div>
+        </div>
+        <div className="year-plans-remarks">{data.remark}</div>
+        <div className="year-plans-bottom">
+          <div className="year-plans-saving-amount">
+            Saving Amount : {data.saving_amount}
           </div>
-          <div className="search-btn">
-            <Button
-              className="search-btn"
-              variant="contained"
-              onClick={filterdata}
-            >
-              Search
-            </Button>
+          <div className="year-plans-success-scoure">
+            Success{" "}
+            {parseFloat(
+              (data.saving_amount / data.expect_budget) * 100
+            ).toFixed(2)}{" "}
+            %
           </div>
         </div>
+        <div className="year-plans-buttons">
+          <Button
+            className="update-btn"
+            variant="contained"
+            onClick={handleEditModal}
+          >
+            Update
+          </Button>
+          <Button
+            className="Delete-btn"
+            variant="contained"
+            color="error"
+            onClick={showdeleteModal}
+          >
+            Delete
+          </Button>
+        </div>
       </div>
-      <div className="all-year-plans-grid">
-        {dataUser.map((val, key) => {
-          return (
-            <YearPlanCard className="year-plan-card" data={val} key={key} />
-          );
-        })}
-      </div>
+      <Modal
+        className="change-access-modal"
+        open={isDeleteModalOpen}
+        onCancel={handleDeleteModal}
+        footer={null}
+      >
+        <div style={{}} className="change-access">
+          <p style={{ fontSize: 18 }}>
+            Are you sure want to delete this Year Plan??
+          </p>
+        </div>
+        <div
+          style={{
+            marginTop: 20,
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+          className="add-student-buttons"
+        >
+          <Button
+            style={{ marginRight: 20 }}
+            className="save-btn"
+            variant="contained"
+            onClick={handleDelete}
+          >
+            Yes
+          </Button>
+          <Button
+            className="cancel-btn"
+            variant="contained"
+            onClick={handleDeleteModal}
+          >
+            No
+          </Button>
+        </div>
+      </Modal>
 
       <Modal
         className="edit-yearplan-model"
-        open={addModal}
-        onCancel={handleCancelAddModal}
+        open={editModal}
+        onCancel={handleCancelEditModal}
         footer={null}
       >
         <div className="add-edit-comp">
           <div className="add-edit-comp-wrapper">
-            <div className="add-edit-comp-title">Add Year Plan</div>
+            <div className="add-edit-comp-title">Edit Year Plan</div>
             <div className="add-edit-comp-middle">
               <div className="add-edit-comp-middle-lable-data">
                 <Input
@@ -229,7 +261,11 @@ const YearPlan = () => {
               </div>
             </div>
             <div className="add-edit-comp-btn">
-              <Button className="save-btn" variant="contained" onClick={submit}>
+              <Button
+                className="save-btn"
+                variant="contained"
+                onClick={editSubmit}
+              >
                 Save
               </Button>
             </div>
@@ -240,4 +276,4 @@ const YearPlan = () => {
   );
 };
 
-export default YearPlan;
+export default YearPlanCard;

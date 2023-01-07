@@ -1,0 +1,34 @@
+.year-plan {
+  .year-plan-search-bar {
+    width: 100%;
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    .all-income-addIcon {
+      font-size: 45px;
+      cursor: pointer;
+    }
+    .search-area {
+      display: flex;
+      .search-box {
+        .search-input {
+          width: 500px;
+        }
+      }
+      .search-btn {
+        .search-btn {
+          margin-left: 20px;
+        }
+      }
+    }
+  }
+  .all-year-plans-grid {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+    padding: 10px;
+    .year-plan-card {
+    }
+  }
+}

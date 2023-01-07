@@ -15,8 +15,18 @@ import {
   deleteMonthIncome,
   updateMonthIncome,
 } from "../../services/actions/incomeAction";
+import {
+  getPresentMoney,
+  updatePresentMoney,
+} from "../../services/actions/presentMoneyAction";
 
-const IECard = ({ data, callFunction, path }) => {
+const IECard = ({
+  data,
+  callFunction,
+  path,
+  dataPaymentMoney,
+  handOnMoney,
+}) => {
   const [editModal, setEditModal] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [recordId, setRecordId] = useState(data._id);
@@ -35,11 +45,13 @@ const IECard = ({ data, callFunction, path }) => {
     setIsDeleteModalOpen(false);
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (saveForm, saveId) => {
     if (path == "expence") {
       let data = dispatch(deleteMonthExpence(recordId)); // delete teacher data
+      dispatch(updatePresentMoney(saveId, saveForm));
     } else if (path == "income") {
       let data = dispatch(deleteMonthIncome(recordId)); // delete teacher data
+      dispatch(updatePresentMoney(saveId, saveForm));
     }
     if (data) {
       handleDeleteModal();
@@ -53,11 +65,13 @@ const IECard = ({ data, callFunction, path }) => {
     handleDeleteModal();
   };
 
-  const editSubmit = async (editForm) => {
+  const editSubmit = async (editForm, saveForm, saveId) => {
     if (path == "expence") {
       let data = dispatch(updateMonthExpence(recordId, editForm)); // save new student data
+      dispatch(updatePresentMoney(saveId, saveForm));
     } else if (path == "income") {
       let data = dispatch(updateMonthIncome(recordId, editForm)); // save new student data
+      dispatch(updatePresentMoney(saveId, saveForm));
     }
     if (data) {
       message.success({
@@ -76,10 +90,57 @@ const IECard = ({ data, callFunction, path }) => {
   };
 
   const deleteCard = () => {
-    handleDelete();
+    let obj = {
+      present_saving_money: 0,
+      present_hand_money: 0,
+      total_present_money: 0,
+      remark: "",
+    };
+
+    let saveMoneyId = "";
+
+    if (path == "expence" && data.state == "Complete") {
+      dataPaymentMoney.map((val) => {
+        obj.present_saving_money = val.present_saving_money;
+        obj.present_hand_money = val.present_hand_money + data.amount;
+        obj.total_present_money =
+          val.present_saving_money + val.present_hand_money + data.amount;
+        saveMoneyId = val._id;
+      });
+    } else if (path == "income" && data.state == "Complete") {
+      if (data.amount > handOnMoney) {
+        message.warning({
+          content:
+            "You can't change the state. Because the hand on money amount is less that the request money amount.",
+          style: {
+            marginTop: "10vh",
+          },
+        });
+        return;
+      } else {
+        dataPaymentMoney.map((val) => {
+          obj.present_saving_money = val.present_saving_money;
+          obj.present_hand_money = val.present_hand_money - data.amount;
+          obj.total_present_money =
+            val.present_saving_money + val.present_hand_money - data.amount;
+          saveMoneyId = val._id;
+        });
+      }
+    }
+    handleDelete(obj, saveMoneyId);
   };
 
   const changeState = async () => {
+    let obj = {
+      present_saving_money: 0,
+      present_hand_money: 0,
+      total_present_money: 0,
+      remark: "",
+    };
+
+    let saveMoneyId = "";
+    let savedMoney = 0;
+
     let form = {
       month_id: data.month_id,
       name: data.name,
@@ -88,7 +149,67 @@ const IECard = ({ data, callFunction, path }) => {
       remark: data.remark,
     };
 
-    editSubmit(form);
+    if (path == "expence" && data.state == "Pending") {
+      if (data.amount > handOnMoney) {
+        message.warning({
+          content:
+            "You can't change the state. Because the hand on money amount is less that the request money amount.",
+          style: {
+            marginTop: "10vh",
+          },
+        });
+        return;
+      } else {
+        dataPaymentMoney.map((val) => {
+          obj.present_saving_money = val.present_saving_money;
+          obj.present_hand_money = val.present_hand_money - data.amount;
+          obj.total_present_money =
+            val.present_saving_money + val.present_hand_money - data.amount;
+          saveMoneyId = val._id;
+          savedMoney = val.present_hand_money;
+        });
+      }
+    } else if (path == "expence" && data.state == "Complete") {
+      dataPaymentMoney.map((val) => {
+        obj.present_saving_money = val.present_saving_money;
+        obj.present_hand_money = val.present_hand_money + data.amount;
+        obj.total_present_money =
+          val.present_saving_money + val.present_hand_money + data.amount;
+        saveMoneyId = val._id;
+        savedMoney = val.present_hand_money;
+      });
+    } else if (path == "income" && data.state == "Complete") {
+      if (data.amount > handOnMoney) {
+        message.warning({
+          content:
+            "You can't change the state. Because the hand on money amount is less that the request money amount.",
+          style: {
+            marginTop: "10vh",
+          },
+        });
+        return;
+      } else {
+        dataPaymentMoney.map((val) => {
+          obj.present_saving_money = val.present_saving_money;
+          obj.present_hand_money = val.present_hand_money - data.amount;
+          obj.total_present_money =
+            val.present_saving_money + val.present_hand_money - data.amount;
+          saveMoneyId = val._id;
+          savedMoney = val.present_hand_money;
+        });
+      }
+    } else if (path == "income" && data.state == "Pending") {
+      dataPaymentMoney.map((val) => {
+        obj.present_saving_money = val.present_saving_money;
+        obj.present_hand_money = val.present_hand_money + data.amount;
+        obj.total_present_money =
+          val.present_saving_money + val.present_hand_money + data.amount;
+        saveMoneyId = val._id;
+        savedMoney = val.present_hand_money;
+      });
+    }
+
+    editSubmit(form, obj, saveMoneyId);
     callFunction();
   };
 
@@ -129,6 +250,7 @@ const IECard = ({ data, callFunction, path }) => {
           >
             Delete
           </Button>
+          {/* {data.state !== "Complete" && ( */}
           <Button
             className="change-state-btn"
             variant="contained"
@@ -137,6 +259,7 @@ const IECard = ({ data, callFunction, path }) => {
           >
             Change State
           </Button>
+          {/* )} */}
         </div>
       </div>
       <Modal
@@ -155,7 +278,9 @@ const IECard = ({ data, callFunction, path }) => {
       >
         <div style={{}} className="change-access">
           <p style={{ fontSize: 18 }}>
-            Are you sure want to delete this Expence??
+            {path == "income"
+              ? "Are you sure want to delete this Income??"
+              : "Are you sure want to delete this Expence??"}
           </p>
         </div>
         <div

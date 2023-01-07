@@ -1,0 +1,43 @@
+.year-plans {
+  .year-plans-wrapper {
+    background-color: #13293d;
+    padding: 10px;
+    border-radius: 10px;
+    .year-plans-top {
+      display: flex;
+      margin-bottom: 20px;
+      .year-plans-name {
+        flex: 3;
+        font-size: 18px;
+      }
+      .year-plans-budget {
+        flex: 1;
+        font-size: 20px;
+      }
+    }
+    .year-plans-remarks {
+      margin-bottom: 20px;
+    }
+    .year-plans-bottom {
+        display: flex;
+        justify-content: space-between;
+      .year-plans-saving-amount {
+        font-size: 20px;
+      }
+      .year-plans-success-scoure{
+        font-size: 18px;
+      }
+    }
+    .year-plans-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      .update-btn {
+      }
+      .Delete-btn {
+      }
+      .change-state-btn {
+      }
+    }
+  }
+}
